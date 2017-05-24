@@ -1,2 +1,3 @@
 # Cryptography
-Work for cryptography applications
+Exploring cryptography and its computational applications
+
