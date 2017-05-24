@@ -1,8 +1,13 @@
-import sys
+import binascii
 
 
+#Xor two hexes
 def strxor(a, b):     # xor two strings of different lengths
     return hex(int(a, 16) ^ int(b, 16))
+
+#Convert hex to ascii
+def toascii(a):
+    return binascii.unhexlify(a)[2:]
 
 # Ciphers
 c1 = '315c4eeaa8b5f8aaf9174145bf43e1784b8fa00dc71d885a804e5ee9fa40b16349c146fb778cdf2d3aff021dfff5b403b510d0d0455468aeb98622b137dae857553ccd8883a7bc37520e06e515d22c954eba5025b8cc57ee59418ce7dc6bc41556bdb36bbca3e8774301fbcaa3b83b220809560987815f65286764703de0f3d524400a19b159610b11ef3e'
@@ -18,6 +23,7 @@ c10 = '466d06ece998b7a2fb1d464fed2ced7641ddaa3cc31c9941cf110abbf409ed39598005b33
 target = '32510ba9babebbbefd001547a810e67149caee11d945cd7fc81a05e9f85aac650e9052ba6a8cd8257bf14d13e6f0a803b54fde9e77472dbff89d71b57bddef121336cb85ccb8f3315f4b52e301d16e9f52f904'
 
 ciphers = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]
+
 
 
 
