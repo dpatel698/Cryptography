@@ -1,13 +1,18 @@
-import binascii
-
+import functools
+import string
+import sys
+from collections import Counter
 
 #Xor two hexes
-def strxor(a, b):     # xor two strings of different lengths
-    return hex(int(a, 16) ^ int(b, 16))
+def strxor(a, b):     # xor two strings (trims the longer input)
+    return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b)])
 
 #Convert hex to ascii
-def toascii(a):
-    return binascii.unhexlify(a)[2:]
+def toascii(chain):
+    return ''.join((chr(int(chain[i:i+2], 16)) for i in range(0, len(chain), 2)))
+
+def tohex(chain):
+    return ''.join((hex(ord(c))[2:] for c in chain))
 
 # Ciphers
 c1 = '315c4eeaa8b5f8aaf9174145bf43e1784b8fa00dc71d885a804e5ee9fa40b16349c146fb778cdf2d3aff021dfff5b403b510d0d0455468aeb98622b137dae857553ccd8883a7bc37520e06e515d22c954eba5025b8cc57ee59418ce7dc6bc41556bdb36bbca3e8774301fbcaa3b83b220809560987815f65286764703de0f3d524400a19b159610b11ef3e'
@@ -24,6 +29,37 @@ target = '32510ba9babebbbefd001547a810e67149caee11d945cd7fc81a05e9f85aac650e9052
 
 ciphers = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]
 
+fin_key = [None]*200
+
+for ciphertext in ciphers:
+
+    counter = Counter()  # Track index hits
+    for index, compare in enumerate(ciphers):
+
+        if ciphertext is not compare:
+            # Find spaces
+
+            for place, char in enumerate(strxor(toascii(ciphertext), toascii(compare))):
+                if char.isalnum():
+                    counter[place] += 1
+
+
+        # Determine known spaces after going through each cipher
+        known_index = []
+        for key, val in counter.items():
+            if val >= 7:
+                known_index.append(key)
+
+    tokey = strxor(toascii(ciphertext), ' '*200)
+    for num in known_index:
+        fin_key[num] = tohex(tokey[num])
+
+
+final_hex_key = ''.join(val if val is not None else '00' for val in fin_key)
+
+
+decryption = strxor(toascii(target), toascii(final_hex_key))
+print(decryption)
 
 
 
