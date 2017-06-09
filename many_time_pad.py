@@ -1,15 +1,24 @@
-import functools
-import string
-import sys
 from collections import Counter
 
-#Xor two hexes
-def strxor(a, b):     # xor two strings (trims the longer input)
-    return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b)])
 
-#Convert hex to ascii
+# Xor two hexes
+def strxor(a, b):     # xor two strings of different lengths
+    if len(a) > len(b):
+       return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a[:len(b)], b)])
+    else:
+       return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b[:len(a)])])
+
+
+def pairwise(a, b):
+    while len(a) and len(b) != 0:
+        yield strxor(a[:2], b[:2])
+        a, b = a[2:], b[2:]
+
+
+# Convert hex to ascii
 def toascii(chain):
     return ''.join((chr(int(chain[i:i+2], 16)) for i in range(0, len(chain), 2)))
+
 
 def tohex(chain):
     return ''.join((hex(ord(c))[2:] for c in chain))
@@ -27,7 +36,7 @@ c9 = '271946f9bbb2aeadec111841a81abc300ecaa01bd8069d5cc91005e9fe4aad6e04d513e96d
 c10 = '466d06ece998b7a2fb1d464fed2ced7641ddaa3cc31c9941cf110abbf409ed39598005b3399ccfafb61d0315fca0a314be138a9f32503bedac8067f03adbf3575c3b8edc9ba7f537530541ab0f9f3cd04ff50d66f1d559ba520e89a2cb2a83'
 target = '32510ba9babebbbefd001547a810e67149caee11d945cd7fc81a05e9f85aac650e9052ba6a8cd8257bf14d13e6f0a803b54fde9e77472dbff89d71b57bddef121336cb85ccb8f3315f4b52e301d16e9f52f904'
 
-ciphers = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]
+ciphers = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, target]
 
 fin_key = [None]*200
 
@@ -40,7 +49,7 @@ for ciphertext in ciphers:
             # Find spaces
 
             for place, char in enumerate(strxor(toascii(ciphertext), toascii(compare))):
-                if char.isalnum():
+                if char.isalnum() and char.isprintable():
                     counter[place] += 1
 
 
@@ -55,11 +64,12 @@ for ciphertext in ciphers:
         fin_key[num] = tohex(tokey[num])
 
 
-final_hex_key = ''.join(val if val is not None else '00' for val in fin_key)
+final_hex_key = ''.join(val if val is not None else '20' for val in fin_key)
 
 
-decryption = strxor(toascii(target), toascii(final_hex_key))
-print(decryption)
+if __name__ == "__main__":
+    decryption = strxor(toascii(target), toascii(final_hex_key))
+    print(decryption)
 
 
 
